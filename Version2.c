@@ -12,6 +12,7 @@ typedef struct node block_type;
 
 int pm_size;
 int remaining;
+int fitType;
 
 
 void option1() { // change function name
@@ -26,6 +27,9 @@ void option1() { // change function name
     block_ptr->start = 0;
     block_ptr->end = 0;
     block_ptr->link = NULL;
+
+    printf("Enter hole-fitting algorithm (0 = first fit, 1 = best fit): ");
+    scanf("%d", &fitType);
 return;
 }
 
@@ -106,7 +110,7 @@ void option2() {
         current_ptr = current_ptr->link;
     }
 // if end of list reached, print message no fitting hole
-    printf("hello");
+    //printf("hello");
     printf("There is no fitting hole");
     // free(new_block_ptr); // main error is here
     return;
@@ -270,11 +274,11 @@ int main() {
         printf("\n Memory Allocation ");
         printf("\n--------------------");
         printf("\n 1) Enter parameter ");
-        printf("\n 2) Allocate memory for block using First-fit ");
-        printf("\n 3) Allocate memory for using Best-fit ");
-        printf("\n 4) Deallocate memory for block ");
-        printf("\n 5) Defragment memory ");
-        printf("\n 6) Quit program ");
+        printf("\n 2) Allocate memory for block using Best-fit ");
+        printf("\n 3) DeAllocate memory");
+        printf("\n 4) Defragment memory for block ");
+        printf("\n 5) Quit ");
+        //printf("\n 6) Quit program ");
 
         printf("\n\n Enter selection : ");
         scanf("%d",&inp);
@@ -282,22 +286,28 @@ int main() {
         if (inp == 1){
             option1();
         } else if (inp == 2){
-            option2();
+            if (fitType == 0){
+                option2();
+            } else if (fitType == 1){
+                option3();
+            } else {
+                printf("Error. Fit Algorithm Type Undetermined. Restart Program and Choose either 0 or 1 during parameter function.");
+            }
+            //option2();//First Fit
+            //option3();//Best Fit
             display();
         } else if (inp == 3){
-            option3();
-            display();
-        } else if (inp == 4){
             option4();
             display();
-        } else if (inp == 5){
+        } else if (inp == 4){
             option5();
             display();
-        } else if (inp == 6){
+        } else if (inp == 5){
             option6();
             inp = 6;
         } else {
             printf("\nEnter a valid number.");
+            main();
         }
     }
 /*
