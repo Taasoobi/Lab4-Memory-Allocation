@@ -6,237 +6,243 @@ int id;
 int start;
 int end;
 struct node* link;
-}* block_ptr = NULL;
+}* blockPtr = NULL;
 
-typedef struct node block_type;
+typedef struct node blockType;
 
-int pm_size;
+int sizePM;
 int remaining;
 int fitType;
 
 
-void option1() {
+void Params() {
     printf("Enter the size of physical memory: ");
-    scanf("%d", &pm_size);
-    remaining = pm_size;
+    scanf("%d", &sizePM);
+    remaining = sizePM;
 
-    block_ptr = (block_type *)malloc(sizeof(block_type));
-    block_ptr->id = -1;
-    block_ptr->start = 0;
-    block_ptr->end = 0;
-    block_ptr->link = NULL;
+    blockPtr = (blockType *)malloc(sizeof(blockType));
+    blockPtr->id = -1;
+    blockPtr->start = 0;
+    blockPtr->end = 0;
+    blockPtr->link = NULL;
     printf("Enter hole-fitting algorithm (0 = first fit, 1 = best fit): ");
     scanf("%d", &fitType);
 return;
 }
 
-void display() {
-    block_type* current_ptr = block_ptr->link;
+void displayTable() {
+    blockType* currentPtr = blockPtr->link;
     printf("ID\tStart\tEnd");
     printf("\n------------------\n");
-    while (current_ptr != NULL){
-        printf("%d\t%d\t%d\n", current_ptr->id, current_ptr->start, current_ptr->end);
-        current_ptr = current_ptr->link;
+    while (currentPtr != NULL){
+        printf("%d\t%d\t%d\n", currentPtr->id, currentPtr->start, currentPtr->end);
+        currentPtr = currentPtr->link;
     }
 return;
 }
 
-void option2() {
-    int block_id,block_size; 
-    block_type* current_ptr = block_ptr;
-    block_type* new_block_ptr;
-    int hole_start, hole_end, hole_size;
+void firstFit() {
+    int blockID,blockSize; 
+    blockType* currentPtr = blockPtr;
+    blockType* newBlockPtr;
+    int holeStart, holeEnd, holeSize;
 
     printf("Enter block id: ");
-    scanf("%d", &block_id); 
+    scanf("%d", &blockID); 
     printf("Enter block size: ");
-    scanf("%d", &block_size); 
+    scanf("%d", &blockSize); 
 
-    if(block_size > remaining){
+    if(blockSize > remaining){
         printf("Not enough memory...");
         return;
     }
 
-    new_block_ptr = (block_type *)malloc(sizeof(block_type));
-    new_block_ptr->id = block_id;
+    newBlockPtr = (blockType *)malloc(sizeof(blockType));
+    newBlockPtr->id = blockID;
 
-    if(block_ptr->link == NULL) {
-        new_block_ptr->start = block_ptr->end;
-        new_block_ptr->end = new_block_ptr->start + block_size;
-        new_block_ptr->link = NULL;
-        block_ptr->link = new_block_ptr;
-        remaining -= block_size;
+    if(blockPtr->link == NULL) {
+        newBlockPtr->start = blockPtr->end;
+        newBlockPtr->end = newBlockPtr->start + blockSize;
+        newBlockPtr->link = NULL;
+        blockPtr->link = newBlockPtr;
+        remaining -= blockSize;
         return;
     }
 
-    while (current_ptr != NULL){
+    while (currentPtr != NULL){
     
-        if (block_id == current_ptr->id){
+        if (blockID == currentPtr->id){
             printf("Duplicate ID...");
-            free(new_block_ptr);
+            free(newBlockPtr);
             return;
         }
-    current_ptr =current_ptr->link;
+    currentPtr =currentPtr->link;
     }
-    current_ptr = block_ptr;
-    while (current_ptr != NULL){
+    currentPtr = blockPtr;
+    while (currentPtr != NULL){
     
-    hole_start = current_ptr->end;
-        if (current_ptr->link != NULL){
-            hole_end = current_ptr->start;
+    holeStart = currentPtr->end;
+        if (currentPtr->link != NULL){
+            holeEnd = currentPtr->start;
         } else { 
-            hole_end = pm_size;
+            holeEnd = sizePM;
         }
-        hole_size = hole_end - hole_start;
+        holeSize = holeEnd - holeStart;
 
-        if (block_size <= hole_size) {
-            new_block_ptr->start = hole_start;
-            new_block_ptr->end = hole_start + block_size;
-            new_block_ptr->link = current_ptr->link;
-            current_ptr->link = new_block_ptr;
-            remaining -= block_size;
+        if (blockSize <= holeSize) {
+            newBlockPtr->start = holeStart;
+            newBlockPtr->end = holeStart + blockSize;
+            newBlockPtr->link = currentPtr->link;
+            currentPtr->link = newBlockPtr;
+            remaining -= blockSize;
             return;
         }
-        current_ptr = current_ptr->link;
+        currentPtr = currentPtr->link;
     }
-    printf("There is no fitting hole");
+    printf("Non Fitting Hole");
     return;
 }
 
-void option3() {
-    int block_id,block_size;
-    block_type* current_ptr = block_ptr;
-    block_type* new_block_ptr;
-    block_type* best_block_ptr;
-    int hole_start, hole_end, hole_size;
-    int at_least_one = 0;
-    int best_so_far;
-    best_so_far = pm_size;
-    int best_start;
+void bestFit() {
+    int blockID,blockSize;
+    blockType* currentPtr = blockPtr;
+    blockType* newBlockPtr;
+    blockType* bestBlockPtr;
+    int holeStart, holeEnd, holeSize;
+    int oneMinimum = 0;
+    int bestCurr;
+    bestCurr = sizePM;
+    int bestStart;
 
     printf("Enter block id: ");
-    scanf("%d", &block_id);
+    scanf("%d", &blockID);
     printf("Enter block size: ");
-    scanf("%d",&block_size);
+    scanf("%d",&blockSize);
 
-    if (block_size > remaining){
+    if (blockSize > remaining){
         printf("Not enough memory...");
         return;
     }
 
-    new_block_ptr = (block_type *)malloc(sizeof(block_type));
-    new_block_ptr->id = block_id;
+    newBlockPtr = (blockType *)malloc(sizeof(blockType));
+    newBlockPtr->id = blockID;
 
-    if(block_ptr->link == NULL) {
-        new_block_ptr->start = block_ptr->end;
-        new_block_ptr->end = new_block_ptr->start + block_size;
-        new_block_ptr->link = NULL;
-        block_ptr->link = new_block_ptr;
-        remaining -= block_size;
+    if(blockPtr->link == NULL) {
+        newBlockPtr->start = blockPtr->end;
+        newBlockPtr->end = newBlockPtr->start + blockSize;
+        newBlockPtr->link = NULL;
+        blockPtr->link = newBlockPtr;
+        remaining -= blockSize;
     return;
     }
 
-    while (current_ptr != NULL){
-        if (block_id == current_ptr->id){
+    while (currentPtr != NULL){
+        if (blockID == currentPtr->id){
             printf("Duplicate ID...");
-            free(new_block_ptr);
+            free(newBlockPtr);
             return;
         }
-        current_ptr =current_ptr->link;
+        currentPtr =currentPtr->link;
     }
 
-    current_ptr = block_ptr;
-    while (current_ptr != NULL){
-        hole_start = current_ptr->end;
-        if (current_ptr->link!= NULL){
-            hole_end = current_ptr->link->start;
+    currentPtr = blockPtr;
+    while (currentPtr != NULL){
+        holeStart = currentPtr->end;
+        if (currentPtr->link!= NULL){
+            holeEnd = currentPtr->link->start;
         } else {
-            hole_end = pm_size;
+            holeEnd = sizePM;
         }
-        hole_size = hole_end - hole_start;
-        if (block_size <= hole_size) {
-            at_least_one = 1;
-            if(hole_size < best_so_far) {
-                best_so_far = hole_size;
-                best_start = hole_start;
-                best_block_ptr = current_ptr;
+        holeSize = holeEnd - holeStart;
+        if (blockSize <= holeSize) {
+            oneMinimum = 1;
+            if(holeSize < bestCurr) {
+                bestCurr = holeSize;
+                bestStart = holeStart;
+                bestBlockPtr = currentPtr;
             }
         }
-        current_ptr = current_ptr->link;
+        currentPtr = currentPtr->link;
     }
-    if(at_least_one == 0){
-        printf("There is no fitting hole");
-        free(new_block_ptr);
-        free(best_block_ptr);
+    if(oneMinimum == 0){
+        printf("Non Fitting Hole");
+        free(newBlockPtr);
+        free(bestBlockPtr);
         return;
     }
 
-    new_block_ptr->start = best_start;
-    new_block_ptr->end = new_block_ptr->start + block_size;
-    new_block_ptr->link = best_block_ptr->link;
-    best_block_ptr->link = new_block_ptr;
-    remaining -= block_size;
+    newBlockPtr->start = bestStart;
+    newBlockPtr->end = newBlockPtr->start + blockSize;
+    newBlockPtr->link = bestBlockPtr->link;
+    bestBlockPtr->link = newBlockPtr;
+    remaining -= blockSize;
     return;
 }
 
-void option4() {
-    block_type* current_ptr = block_ptr;
-    block_type* previous_ptr;
-    int block_size,block_id;
+void deAllocate() {
+    blockType* currentPtr = blockPtr;
+    blockType* prevPtr;
+    int blockSize,blockID;
     
     printf("Enter block id: ");
-    scanf("%d",&block_id);
-    while((current_ptr != NULL) && (block_id != current_ptr->id)){
+    scanf("%d",&blockID);
+    while((currentPtr != NULL) && (blockID != currentPtr->id)){
         
-        previous_ptr = current_ptr;
-        current_ptr = current_ptr->link;
+        prevPtr = currentPtr;
+        currentPtr = currentPtr->link;
     }
     
-    if(current_ptr == NULL){
+    if(currentPtr == NULL){
         printf("ID not found...");
         return;
     }
-    previous_ptr->link = current_ptr->link;
-    block_size = current_ptr->end - current_ptr->start;
-    remaining += block_size;
-    free(current_ptr);
+    prevPtr->link = currentPtr->link;
+    blockSize = currentPtr->end - currentPtr->start;
+    remaining += blockSize;
+    free(currentPtr);
 return;
 }
 
 
 
-void option5() {
-    block_type* current_ptr = block_ptr;
-    int block_size;
-    int prev_block_end = block_ptr->end;
+void deFrag() {
+    blockType* currentPtr = blockPtr;
+    int blockSize;
+    int prevBlockEnd = blockPtr->end;
 
-    while(current_ptr != NULL){
-        block_size = current_ptr->end - current_ptr->start;
-        current_ptr->start = prev_block_end;
-        current_ptr->end = current_ptr->start + block_size;
-        prev_block_end = current_ptr->end;
-        current_ptr=current_ptr->link;
+    while(currentPtr != NULL){
+        blockSize = currentPtr->end - currentPtr->start;
+        currentPtr->start = prevBlockEnd;
+        currentPtr->end = currentPtr->start + blockSize;
+        prevBlockEnd = currentPtr->end;
+        currentPtr=currentPtr->link;
     }
 
 return;
 }
 
-void option6() {
-block_type* block_ptr;
+void quitFunc() {
+blockType* blockPtr;
 
-    if(block_ptr == NULL){
+    if(blockPtr == NULL){
         return;
     }else{
-        option6(block_ptr->link);
+        quitFunc(blockPtr->link);
     }
-    free(block_ptr);
+    free(blockPtr);
 return;
 }
 
 int main() {
     //Ctrl + Shift + L
     int inp;
-    while (inp != 6){
+    //sample 1
+    //1 1024 1 2 0 128 2 1 320 2 2 224 2 3 288 3 2 2 4 128 3 1 2 2 224 2 5 64 4
+    
+    //sample 2
+    //1 1024 0 2 0 128 2 1 320 2 2 224 2 3 288 3 2 2 4 128 3 1 2 2 224 2 5 64 4
+
+    while (inp != 5){
         printf("\n Memory Allocation ");
         printf("\n--------------------");
         printf("\n 1) Enter parameter ");
@@ -249,25 +255,25 @@ int main() {
         scanf("%d",&inp);
 
         if (inp == 1){
-            option1();
+            Params();
         } else if (inp == 2){
             if (fitType == 0){
-                option2();//First Fit
+                firstFit();//First Fit
             } else if (fitType == 1){
-                option3();//Best Fit
+                bestFit();//Best Fit
             } else {
                 printf("Error. Fit Algorithm Type Undetermined. Restart Program and Choose either 0 or 1 during parameter function.");
             }
-            display();
+            displayTable();
         } else if (inp == 3){
-            option4();
-            display();
+            deAllocate();
+            displayTable();
         } else if (inp == 4){
-            option5();
-            display();
+            deFrag();
+            displayTable();
         } else if (inp == 5){
-            option6();
-            inp = 6;
+            quitFunc();
+            inp = 5;
         } else {
             printf("\nEnter a valid number.");
             main();
